@@ -30,6 +30,7 @@ CREATE TABLE IF NOT EXISTS LIBROS
 
 );
 
+desc LIBROS;
 
 /* INSERTAMOS LOS DATOS EN AUTORES DONDE SOLO UNO PODRÍA SER NULO EL CUAL ES EL SEUDONIMO PERO NO LO HEMOS DEJADO NULO */
 
@@ -78,7 +79,7 @@ FROM LIBROS;
 ALTER TABLE LIBROS
     DROP COLUMN STOCK; -- HEMOS ELIMINAOD LA COLUMNA STOCK DE LA TABLA LIBROS
 
-DESC LIBROS; -- AL MIRAR LA DESCRIPCION DE LA TABLA VEREMOS QUE NO EXISTE YA ESA COLUMNA
+DESC LIBROS; -- AL MIRAR LA DESCRIPCION DE LA TABLA VEREMOS QUE NO EXISTE YA ESA COLUMNA / DESC NOS DESCRIBE LA TRABLA CON SUS COLUMNAS Y TIPOS DE DATOS
 
 ALTER TABLE LIBROS RENAME BOOKS; -- PARA CAMBIAR EL NOMBRE DE LA TABLA LIBROS A BOOKS
 
@@ -145,7 +146,7 @@ WHERE SEUDONIMO <=> NULL;
 SELECT TITULO
 FROM LIBROS
 WHERE FECHA_PUBLICACION BETWEEN '1892-01-03' AND '1975-01-01';
--- TYAMBIEN PODEMOS HACER CONSULTAS NO SOLO POR RANGO DE FECHA
+-- TAMBIEN PODEMOS HACER CONSULTAS NO SOLO POR RANGO DE FECHA
 
 /* HACER CONSULTA DE REGISTROS UNICOS */
 
@@ -159,11 +160,14 @@ FROM LIBROS;
 
 UPDATE LIBROS
 SET TITULO = 'Mi lucha veneca'
-WHERE LIBRO_ID = 21; -- UPDATE NOS PERMITE ACTUALIXAR UN CAMPO DE UN REGISTRO Y SET ESTABLECER EL NUEVO CONTENIDO DEL CAMPO
+WHERE LIBRO_ID = 21; -- UPDATE NOS PERMITE ACTUALIZAR UN CAMPO DE UN REGISTRO Y SET ESTABLECER EL NUEVO CONTENIDO DEL CAMPO
 
 UPDATE LIBROS
 SET TITULO = ' Un libro comun '; -- ¡CUIDADO! UTILIZAR EL UPDATE Y EL SET SIN UTILIZAR UN WHERE ESTABLECERA EL VALOR PARA TODA LA TABLA SIN RESTRICCIONES
 
+UPDATE AUTORES
+SET APELLIDO = 'Hitler'
+WHERE AUTOR_ID = 4;
 SELECT *
 FROM AUTORES;
 
@@ -173,7 +177,7 @@ DELETE
 FROM LIBROS
 WHERE AUTOR_ID = 5;
 -- DELETE nos permite eliminar un registro y con la condicion WHERE escogerems que borrar
--- En este caso la sentencia eliminara todo los libros cuyo autor sea 5
+-- En este caso la sentencia eliminara todos los libros cuyo autor sea 5
 
 DELETE
 FROM LIBROS;
@@ -182,22 +186,29 @@ FROM LIBROS;
 
  /*ELIMINACION EN CASCADA
 
-   nos permite eliminar atos que se encuentren referenciados en otra tabla es decir datos que sean llaves foraneas
-   en otra tabla pero para ello debemos modificar la tabla original o sea de donde proviene ese dato
+   nos permite eliminar datos que se encuentren referenciados en otra tabla es decir datos que sean llaves foraneas
+   en otra tabla pero para ello debemos modificar la tabla original o sea de donde proviene ese dato (si es que tenemos ya la tabla con datos añadidos)
 
    */
+SHOW CREATE TABLE LIBROS; /* PEDIMOS EUE NOS MUESTR TODA LA INFORMACIÓN DE LA CRAECION DE LA TABLA Y BUSCAMOS EL NOMBRE_CONSTRAINT*/
 
-
-ALTER TABLE LIBROS DROP  FOREIGN KEY LIBROS_ibfk_1 ; -- Primero eliminamos la llave foranea de la tabla libros que es donde esta referenciada
+ALTER TABLE LIBROS DROP  FOREIGN KEY LIBROS_ibfk_1; -- Primero eliminamos la llave foranea de la tabla libros que es donde esta referenciada
 
 ALTER TABLE LIBROS ADD FOREIGN KEY (AUTOR_ID) REFERENCES AUTORES (AUTOR_ID) ON DELETE CASCADE; -- luego añadimos de nuevo la llave foranea solo que con un cambio ON DELETE CASCADE; que nos permite eliminar directamente el autor asi este referenciada
 
 DELETE FROM  AUTORES WHERE AUTOR_ID = 5; -- procedemos a eliminar el autor con id 5 y no nos arrojara un error de identidad referncial porque donde se hace la referencia tiene el ON DELETE CASCADE
 
+desc LIBROS;
+
+/* SI VISUALIZAMOS VEREMOS QUE EL REGISTRO DEL AUTOR NO SE ENCUENTRA Y POR LO TANTO NINGUN LIBRO REGISTRADO QUE LE CORRESPONDA */
+
+SELECT * FROM AUTORES;
+SELECT * FROM LIBROS;
 
 
+/* PARA LA ELIMINACION DE LOS DATOS INCERTADOS EN UNA TABLA */
 
-
+TRUNCATE TABLE LIBROS; /*A DIFERENCIA DE USAR UN DELETE SIN UN WHERE EL TRUNCATE BORRA TODOS LOS METADATOS ES DECIR NO SE CONTAMINA LA TABLA DE METADATOS ANTIGUOS*/
 
 /* RECURRING EXECUTE */
 
